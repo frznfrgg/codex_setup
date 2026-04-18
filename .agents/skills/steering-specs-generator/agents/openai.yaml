@@ -1,0 +1,4 @@
+interface:
+  display_name: "Steering Specs Generator"
+  short_description: "Generate steerings from team conventions"
+  default_prompt: "Use $steering-specs-generator to interview for conventions and generate steering files."

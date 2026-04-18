@@ -1,0 +1,4 @@
+interface:
+  display_name: "Act"
+  short_description: "Execute pre-planned task workflows"
+  default_prompt: "Use $act to execute a pre-planned task from the task folder workflow."

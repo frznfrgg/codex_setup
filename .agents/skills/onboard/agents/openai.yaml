@@ -1,0 +1,4 @@
+interface:
+  display_name: "Onboard"
+  short_description: "Project onboarding and state snapshot"
+  default_prompt: "Use $onboard to get familiar with this project before starting work."

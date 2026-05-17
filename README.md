@@ -39,13 +39,22 @@ Configured in `.codex/agents/`.
   Documentation worker.
 
 - `test-writer`
-  Testing worker.
+  Testing worker that writes must-have tests for assigned subtasks.
 
 - `validator`
   Runs quality checks and build.
 
+- `code-reviewer`
+  Phase 3 read-only reviewer that checks general engineering quality, correctness, maintainability, architecture fit, reliability, and regression risk.
+
+- `test-auditor`
+  Phase 3 read-only reviewer that checks whether tests are meaningful, sufficient, and aligned with the plan.
+
+- `security-auditor`
+  Conditional Phase 3 read-only reviewer that checks practical security risks when a task touches security-sensitive surfaces.
+
 - `auditor`
-  Reviews the completed implementation against the plan and test results.
+  Thin final Phase 3 gate that aggregates validator context plus code-reviewer, test-auditor, and security-auditor reports into one authoritative audit decision.
 
 ## Recommended End-to-End Flow
 
@@ -84,7 +93,7 @@ Each subtask should be assigned to exactly one Phase 2 worker agent:
 - `docs-writer`
 - `test-writer`
 
-Do not place `validator` or `auditor` in `subtasks/index.md`.
+Do not place `validator`, `code-reviewer`, `test-auditor`, `security-auditor`, or `auditor` in `subtasks/index.md`.
 
 ### 4. Execute the task with `$act`
 
@@ -98,9 +107,10 @@ It will:
 4. Run each `seq` wave in parallel.
 5. Wait for the whole wave to finish before starting the next one.
 6. Run `validator`.
-7. Run `auditor`.
-8. Create fix subtasks if validation or audit fails.
-9. Repeat until the task passes or the flow must stop and escalate.
+7. Run `code-reviewer` and `test-auditor`, plus `security-auditor` when the task touches security-sensitive surfaces.
+8. Run the final `auditor` to aggregate review reports into one audit decision.
+9. Create fix subtasks if validation, code review, test audit, security audit, or final audit fails.
+10. Repeat until the task passes or the flow must stop and escalate.
 
 ### 5. Review the final summary
 
@@ -177,7 +187,7 @@ For a normal piece of work:
 - Missing steering files in `.memory-bank/steerings/`
 - Using display names instead of exact agent IDs
 - Forgetting `seq={N}` in `subtasks/index.md`
-- Putting `validator` or `auditor` into Phase 2 subtasks
+- Putting `validator`, `code-reviewer`, `test-auditor`, `security-auditor`, or `auditor` into Phase 2 subtasks
 - Running execution without a proper task folder
 
 ## If You Want to Dive Deeper

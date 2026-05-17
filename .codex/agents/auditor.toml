@@ -1,6 +1,6 @@
 name = "auditor"
 description = "Independent verification agent for Phase 3 of task implementation workflow. Invoked with plan.md path, subtasks/index.md path, and task ID. Delegates the entire audit and report generation to an external agent run."
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """

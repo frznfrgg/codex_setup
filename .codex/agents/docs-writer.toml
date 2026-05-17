@@ -1,6 +1,6 @@
 name = "docs-writer"
 description = "Creates and updates technical documentation (.md files), ensuring format consistency using the standard worker contract: task_id, plan_path, subtask_path."
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 developer_instructions = """

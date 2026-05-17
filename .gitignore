@@ -1,0 +1,24 @@
+# agentic scaffold runtime state
+.sessions/
+.memory-bank/backlog/
+
+# local tool state
+.serena/cache/
+.serena/project.local.yml
+
+# dependencies
+node_modules/
+
+# local secrets/config
+.env
+.env.*
+!.env.example
+
+# build and coverage artifacts
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# OS/editor noise
+.DS_Store

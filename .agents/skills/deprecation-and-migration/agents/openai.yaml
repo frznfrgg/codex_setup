@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deprecation & Migration"
+  short_description: "Plan safe replacement and removal"
+  default_prompt: "Use $deprecation-and-migration when replacing, removing, deprecating, migrating, or consolidating existing systems, APIs, data, or dependencies."

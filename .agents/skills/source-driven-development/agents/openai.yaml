@@ -1,0 +1,4 @@
+interface:
+  display_name: "Source-Driven Development"
+  short_description: "Verify implementation patterns with official docs"
+  default_prompt: "Use $source-driven-development when framework, library, runtime, or platform behavior should be verified against official documentation."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Idea Refine"
+  short_description: "Refine vague ideas into sharp concepts"
+  default_prompt: "Use $idea-refine to turn a rough idea into a focused one-pager with assumptions, MVP scope, and non-goals."

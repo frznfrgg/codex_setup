@@ -1,0 +1,4 @@
+interface:
+  display_name: "CI/CD & Automation"
+  short_description: "Plan quality gates and automation"
+  default_prompt: "Use $ci-cd-and-automation when setting up or changing CI, build automation, release gates, deployment automation, or command contracts."

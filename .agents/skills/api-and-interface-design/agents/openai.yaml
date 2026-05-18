@@ -1,0 +1,4 @@
+interface:
+  display_name: "API & Interface Design"
+  short_description: "Design stable contracts and boundaries"
+  default_prompt: "Use $api-and-interface-design when planning or reviewing APIs, schemas, module boundaries, CLI contracts, or integration contracts."

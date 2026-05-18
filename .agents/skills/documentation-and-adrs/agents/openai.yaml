@@ -1,0 +1,4 @@
+interface:
+  display_name: "Documentation & ADRs"
+  short_description: "Record decisions and docs requirements"
+  default_prompt: "Use $documentation-and-adrs when architectural decisions, public APIs, user-facing behavior, or major dependencies need durable documentation."

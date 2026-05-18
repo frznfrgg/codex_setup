@@ -4,13 +4,14 @@ This repository contains a workflow for turning an idea into an executable task,
 
 ## What This Setup Does
 
-The flow is built around three stages:
+The flow is built around four stages:
 
 1. Capture and refine project knowledge into steerings.
-2. Turn a concrete idea into a task plan and subtasks.
-3. Execute those subtasks through worker agents, then validate and audit the result.
+2. Create a durable `.plans/PLAN_*.md` planning artifact.
+3. Split an approved plan into ACT task artifacts.
+4. Execute those subtasks through worker agents, then validate and audit the result.
 
-The main execution skill is `$act`.
+The main execution skill is `$act`. The planning pipeline is `$plan` followed by `$split-to-tasks`.
 
 ## Main Parts
 
@@ -18,6 +19,39 @@ The main execution skill is `$act`.
 
 - `.agents/skills/act/`
   Runs a prepared task from `.tasks/{TASK-ID}/` through execution, validation, audit, and approval.
+
+- `.agents/skills/plan/`
+  Creates or updates `.plans/PLAN_{id-or-feature-name}.md` as the source-of-truth planning artifact. It can lazily consult technical module skills, but it does not create ACT subtasks.
+
+- `.agents/skills/split-to-tasks/`
+  Converts a ready `.plans/PLAN_*.md` into ACT-ready `.tasks/{TASK-ID}/plan.md`, `subtasks/index.md`, and `stt-*.md` files.
+
+- `.agents/skills/interview-me/`
+  Optional pre-plan skill for clarifying intent when the ask is underspecified.
+
+- `.agents/skills/idea-refine/`
+  Optional pre-plan skill for refining a vague idea into a concrete one-pager.
+
+- `.agents/skills/api-and-interface-design/`
+  Lazy planning module for APIs, module boundaries, schemas, CLI contracts, integration contracts, and data/model contracts.
+
+- `.agents/skills/source-driven-development/`
+  Lazy planning/development module for framework, library, runtime, and platform decisions that need official documentation.
+
+- `.agents/skills/ci-cd-and-automation/`
+  Standalone skill and lazy planning module for CI, build automation, release gates, deployment automation, and command contracts.
+
+- `.agents/skills/deprecation-and-migration/`
+  Standalone skill and lazy planning module for replacing, removing, deprecating, migrating, or consolidating existing behavior.
+
+- `.agents/skills/documentation-and-adrs/`
+  Standalone skill and lazy planning module for ADRs, docs, README, changelog, and memory-bank documentation requirements.
+
+- `.agents/skills/code-review-and-quality/`
+  Standalone manual code review skill. ACT automated review uses the `code-reviewer` agent.
+
+- `.agents/skills/security-and-hardening/`
+  Standalone manual security guidance skill. ACT automated security review uses the `security-auditor` agent.
 
 - `.agents/skills/onboard/`
   Helps an agent understand the project structure and current state before starting work.
@@ -70,9 +104,30 @@ Its goal is to produce steering files such as:
 
 These are important because the worker agents depend on them.
 
-### 2. Create a task
+### 2. Create or update a plan
 
-Once you have a concrete idea, convert it into a task folder:
+Use optional pre-plan skills only when needed:
+
+- `$interview-me` if intent, user, success criteria, constraints, or non-goals are unclear.
+- `$idea-refine` if the idea or MVP scope is still fuzzy.
+
+Then use `$plan` to create or update:
+
+```text
+.plans/PLAN_{id-or-feature-name}.md
+```
+
+The plan is the exploratory source of truth. It should end with `READY_FOR_SPLIT: yes` only when decisions are stable enough for ACT decomposition.
+
+### 3. Split the plan into a task
+
+Once the plan is ready, use `$split-to-tasks` with the plan path and task ID:
+
+```text
+$split-to-tasks .plans/PLAN_feature-name.md TASK-001
+```
+
+It creates:
 
 ```text
 .tasks/{TASK-ID}/
@@ -84,7 +139,7 @@ Once you have a concrete idea, convert it into a task folder:
     └── ...
 ```
 
-### 3. Split the task into valid subtasks
+### 4. Ensure valid subtasks
 
 Each subtask should be assigned to exactly one Phase 2 worker agent:
 
@@ -95,7 +150,7 @@ Each subtask should be assigned to exactly one Phase 2 worker agent:
 
 Do not place `validator`, `code-reviewer`, `test-auditor`, `security-auditor`, or `auditor` in `subtasks/index.md`.
 
-### 4. Execute the task with `$act`
+### 5. Execute the task with `$act`
 
 `$act` is the orchestrator.
 
@@ -112,7 +167,7 @@ It will:
 9. Create fix subtasks if validation, code review, test audit, security audit, or final audit fails.
 10. Repeat until the task passes or the flow must stop and escalate.
 
-### 5. Review the final summary
+### 6. Review the final summary
 
 If validation and audit pass, the flow ends with a short approval summary for the user.
 
@@ -124,6 +179,7 @@ At minimum, make sure these exist:
 .memory-bank/steerings/development-conventions.md
 .memory-bank/steerings/testing-conventions.md
 .memory-bank/steerings/project-commands.md
+.plans/PLAN_{id-or-feature-name}.md
 .tasks/{TASK-ID}/plan.md
 .tasks/{TASK-ID}/subtasks/index.md
 ```
@@ -175,12 +231,14 @@ That means each worker reads:
 For a normal piece of work:
 
 1. Create project steerings if needed.
-2. Write the task plan.
-3. Create valid subtasks and `index.md`.
-4. Switch to the task branch.
-5. Run `$act`.
-6. Wait for validation and audit.
-7. Review the final summary and approve.
+2. Optionally use `$interview-me` or `$idea-refine`.
+3. Use `$plan` to create or update `.plans/PLAN_*.md`.
+4. Review the plan and set `READY_FOR_SPLIT: yes`.
+5. Use `$split-to-tasks` to create `.tasks/{TASK-ID}/`.
+6. Switch to the task branch.
+7. Run `$act`.
+8. Wait for validation and audit.
+9. Review the final summary and approve.
 
 ## Common Mistakes
 
@@ -188,6 +246,7 @@ For a normal piece of work:
 - Using display names instead of exact agent IDs
 - Forgetting `seq={N}` in `subtasks/index.md`
 - Putting `validator`, `code-reviewer`, `test-auditor`, `security-auditor`, or `auditor` into Phase 2 subtasks
+- Running `$split-to-tasks` before `.plans/PLAN_*.md` has `READY_FOR_SPLIT: yes`
 - Running execution without a proper task folder
 
 ## If You Want to Dive Deeper
@@ -195,8 +254,10 @@ For a normal piece of work:
 Start in this order:
 
 1. Read `.agents/skills/act/SKILL.md`
-2. Read `.agents/skills/steering-specs-generator/SKILL.md`
-3. Read `.codex/agents/*.toml`
-4. Create one small test task and run the flow on it
+2. Read `.agents/skills/plan/SKILL.md`
+3. Read `.agents/skills/split-to-tasks/SKILL.md`
+4. Read `.agents/skills/steering-specs-generator/SKILL.md`
+5. Read `.codex/agents/*.toml`
+6. Create one small test task and run the flow on it
 
 That is the fastest way to understand how the pieces fit together.

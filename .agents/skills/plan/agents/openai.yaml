@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan"
+  short_description: "Create or update a source-of-truth plan"
+  default_prompt: "Use $plan to create or update a .plans/PLAN_*.md planning artifact without creating ACT subtasks yet."

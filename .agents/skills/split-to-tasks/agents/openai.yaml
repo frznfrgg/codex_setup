@@ -1,0 +1,4 @@
+interface:
+  display_name: "Split To Tasks"
+  short_description: "Convert a ready plan into ACT tasks"
+  default_prompt: "Use $split-to-tasks with a .plans/PLAN_*.md path and task ID to generate ACT-ready task artifacts."

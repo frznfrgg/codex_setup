@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security & Hardening"
+  short_description: "Manual security hardening guidance"
+  default_prompt: "Use $security-and-hardening to manually review or design security-sensitive code, input handling, auth, data protection, and integrations."

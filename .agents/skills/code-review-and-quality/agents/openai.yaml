@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review & Quality"
+  short_description: "Manual multi-axis code review"
+  default_prompt: "Use $code-review-and-quality to manually review a change across correctness, readability, architecture, security, and performance."

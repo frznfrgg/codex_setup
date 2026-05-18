@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shipping & Launch"
+  short_description: "Prepare safe releases and rollbacks"
+  default_prompt: "Use $shipping-and-launch after ACT passes when preparing a production launch, staged rollout, monitoring plan, or rollback strategy."

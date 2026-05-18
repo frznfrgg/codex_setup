@@ -20,6 +20,8 @@ We keep validation commands explicit so all agents verify work through the same 
 4. The validator must run quality check before build.
 5. The auditor must run the test command when assessing `TEST_STATUS`.
 6. Update this file whenever package scripts, build commands, or release gates change.
+7. Define any project-specific pre-commit or pre-push checks here instead of relying on agent memory.
+8. Document generated-file expectations so workers know what should and should not be committed.
 
 ## Practices (How)
 
@@ -44,6 +46,19 @@ Build: pnpm build
 Tests: pnpm test
 Release check: pnpm release:check
 ```
+
+### Git Hygiene Contract
+
+Replace placeholders with project-specific commands when available.
+
+```text
+Inspect working tree: git status --short
+Inspect staged diff: git diff --staged
+Secret scan: <replace with command or "manual diff inspection">
+Generated files policy: <replace with tracked generated files, or "none">
+```
+
+Workers should inspect what they are about to commit and avoid staging unrelated changes.
 
 ## Meta
 

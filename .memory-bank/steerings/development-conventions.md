@@ -22,6 +22,9 @@ We keep implementation work scoped, maintainable, and consistent with the projec
 6. Preserve public contracts unless the task explicitly changes them.
 7. Keep project-specific secrets, credentials, and local machine paths out of committed files.
 8. Document non-obvious architectural decisions in `.memory-bank/architecture/`.
+9. Keep commits atomic when ACT workers commit: one logical subtask completion per commit.
+10. Separate formatting-only cleanup, refactors, tests, docs, and behavior changes unless the subtask explicitly couples them.
+11. Do not commit generated files, dependency folders, build output, or environment files unless the project explicitly expects them.
 
 ## Practices (How)
 
@@ -48,6 +51,25 @@ When a decision needs durable context, record it in `.memory-bank/architecture/`
 
 ```markdown
 [.memory-bank/architecture/example-boundary.md]: Explains the boundary used by this implementation.
+```
+
+### Version Control Discipline
+
+Treat commits as reviewable save points.
+
+```text
+Good: task(TASK-001): complete stt-002
+Avoid: misc updates
+```
+
+Before committing, inspect the diff and ensure the commit contains only files required by the current task or subtask. If unrelated modified files exist, leave them alone.
+
+```text
+Check:
+- no secrets or local paths
+- no dependency folders or build output
+- no formatting-only churn mixed into behavior changes
+- generated files included only when project conventions require them
 ```
 
 ## Meta

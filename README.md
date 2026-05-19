@@ -325,6 +325,14 @@ flowchart TD
 - Treating `$act` as a planner instead of an executor.
 - Editing task order in prose instead of encoding it with `seq`.
 
+## Acknowledgements
+
+This scaffold stands on useful prior art and generous shared work:
+
+- [Timur Khahalev](https://github.com/timurkhakhalev) - for the general Plan-and-Act idea and core skill patterns.
+- [agent-skills](https://github.com/addyosmani/agent-skills) - curated by Google repo used as a reference point on subagents and skills for Claude.
+- [Rodion Mostovoi / CodeAlive-AI](https://github.com/CodeAlive-AI/ai-driven-development/tree/main/hooks/balanced-safety-hooks) - for the original Claude-oriented Bash safety hooks.
+
 ## Dive Deeper
 
 Read these files in order:

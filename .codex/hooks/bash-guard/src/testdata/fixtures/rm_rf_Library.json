@@ -1,0 +1,17 @@
+{
+  "name": "rm_rf_Library",
+  "description": "rm -rf /home/example-user/Library/<...>",
+  "env": { "HOME": "/home/example-user" },
+  "input": {
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "rm -rf /home/example-user/Library/Application\\ Support/X"
+    },
+    "cwd": "/home/example-user/myproject"
+  },
+  "expect": {
+    "decision": "ask",
+    "rule": "rm",
+    "reason_code": "rm.catastrophic"
+  }
+}

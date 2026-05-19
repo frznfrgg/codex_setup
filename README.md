@@ -33,6 +33,7 @@ optional post-ACT skills
 | --- | --- |
 | Skill | A reusable workflow instruction set in `.agents/skills/*/SKILL.md`. Skills can be invoked directly, or loaded lazily by another skill when their trigger applies. |
 | Agent | A specialized runtime subagent configured in `.codex/agents/*.toml`. ACT uses agents for implementation, validation, review, and final audit. |
+| Hook | A project-local Codex event integration configured in `.codex/hooks.json`. Hooks can inspect tool calls or user prompts before Codex continues. |
 | Steering | Durable project convention stored in `.memory-bank/steerings/`. Workers read these before implementing or testing. |
 | Plan | A source-of-truth planning artifact at `.plans/PLAN_*.md`. `$split-to-tasks` requires `READY_FOR_SPLIT: yes`. |
 | Task | An ACT execution folder at `.tasks/{TASK-ID}/` containing `plan.md`, `subtasks/index.md`, and `stt-*.md` files. |
@@ -84,6 +85,27 @@ ACT is deliberately an executor, not a planner. It does not reorder subtasks, in
 | Phase 3 gate | `security-auditor` | [`.codex/agents/security-auditor.toml`](.codex/agents/security-auditor.toml) | Conditionally audit security-sensitive changes. |
 | Phase 3 final gate | `auditor` | [`.codex/agents/auditor.toml`](.codex/agents/auditor.toml) | Aggregate validator and reviewer outputs into the authoritative audit decision. |
 
+## Hooks
+
+| System | Event | Config | Source | Purpose |
+| --- | --- | --- | --- | --- |
+| `bash-guard` | `PreToolUse` for `Bash` | [`.codex/hooks.json`](.codex/hooks.json) | [`.codex/hooks/bash-guard/src/`](.codex/hooks/bash-guard/src/) | Checks Bash commands before execution and blocks risky commands until explicitly approved. |
+| `bash-guard` | `UserPromptSubmit` | [`.codex/hooks.json`](.codex/hooks.json) | [`.codex/hooks/bash-guard/src/user_prompt.go`](.codex/hooks/bash-guard/src/user_prompt.go) | Records one-shot approvals for prompts shaped as `approve-risk <hash>`. |
+
+Both hook entries use the same Go binary:
+
+```text
+.codex/hooks/bash-guard/src/bash_guard.bin
+```
+
+Build it locally before relying on the hook:
+
+```bash
+bash .codex/hooks/bash-guard/build.sh
+```
+
+Then open `/hooks` in Codex and review/trust the project hooks. See [`.codex/hooks/hooks_readme.md`](.codex/hooks/hooks_readme.md) for the hook-specific setup notes.
+
 ## How To Use The Pipeline
 
 ### 1. Onboard to the repo
@@ -104,7 +126,17 @@ At minimum, ACT workers expect:
 
 Before real ACT execution, replace template command placeholders in `project-commands.md` with concrete quality, build, and test commands.
 
-### 3. Clarify only when needed
+### 3. Build and trust local hooks
+
+Build the Bash safety hook:
+
+```bash
+bash .codex/hooks/bash-guard/build.sh
+```
+
+Then open `/hooks` in Codex and trust the project-local hooks. The hook protects Bash tool usage and supports one-shot approval prompts for risky commands.
+
+### 4. Clarify only when needed
 
 Use optional pre-plan skills when the request is not ready to plan:
 
@@ -113,7 +145,7 @@ Use optional pre-plan skills when the request is not ready to plan:
 
 Skip both when the request is already concrete enough for `$plan`.
 
-### 4. Create the plan
+### 5. Create the plan
 
 Use `$plan` to create or update:
 
@@ -129,7 +161,7 @@ READY_FOR_SPLIT: yes
 
 only when all blocking decisions are made.
 
-### 5. Split the plan into ACT artifacts
+### 6. Split the plan into ACT artifacts
 
 Run `$split-to-tasks` only after the plan is ready:
 
@@ -149,7 +181,7 @@ It creates:
     └── ...
 ```
 
-### 6. Execute with ACT
+### 7. Execute with ACT
 
 Switch to a task-specific branch, then run:
 
@@ -159,7 +191,7 @@ $act TASK-001
 
 ACT will validate the task folder, execute subtask waves by `seq`, run validation and review gates, create fix subtasks for blocking findings, and stop for final user approval after all required gates pass.
 
-### 7. Use post-ACT skills manually
+### 8. Use post-ACT skills manually
 
 After ACT passes, use these only when useful:
 
@@ -285,6 +317,7 @@ flowchart TD
 
 - Running `$act` while steering files are still generic templates.
 - Leaving concrete quality, build, or test commands undefined in `project-commands.md`.
+- Trusting hooks before building `.codex/hooks/bash-guard/src/bash_guard.bin`.
 - Running `$split-to-tasks` before the plan says `READY_FOR_SPLIT: yes`.
 - Using display names instead of exact skill or agent IDs.
 - Forgetting `seq=N` in `subtasks/index.md`.

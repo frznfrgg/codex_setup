@@ -22,3 +22,9 @@ coverage/
 
 # OS/editor noise
 .DS_Store
+
+# Codex hook local build/runtime artifacts
+# compiled hook artifacts
+.codex/hooks/bash-guard/src/bash_guard.bin
+.codex/hooks/bash-guard/src/dist/
+.codex/hooks/bash-guard/src/build.log

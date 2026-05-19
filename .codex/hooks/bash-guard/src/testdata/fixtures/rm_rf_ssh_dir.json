@@ -1,0 +1,17 @@
+{
+  "name": "rm_rf_ssh_dir",
+  "description": "rm -rf /home/example-user/.ssh",
+  "env": { "HOME": "/home/example-user" },
+  "input": {
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "rm -rf /home/example-user/.ssh"
+    },
+    "cwd": "/home/example-user/myproject"
+  },
+  "expect": {
+    "decision": "ask",
+    "rule": "rm",
+    "reason_code": "rm.catastrophic"
+  }
+}

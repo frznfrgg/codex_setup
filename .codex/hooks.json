@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/bash-guard/src/bash_guard.bin\"",
+            "timeout": 10,
+            "statusMessage": "Checking Bash safety"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/bash-guard/src/bash_guard.bin\"",
+            "timeout": 3,
+            "statusMessage": "Checking risk approval"
+          }
+        ]
+      }
+    ]
+  }
+}

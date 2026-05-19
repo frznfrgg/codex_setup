@@ -1,127 +1,137 @@
-# Workflow Setup README
+# Codex Scaffold
 
-This repository contains a workflow for turning an idea into an executable task, then running that task through specialized agents with validation and audit at the end.
+This repository is a reusable setup scaffold for running Codex through a structured Plan-and-Act workflow.
 
-## What This Setup Does
+It is not an application codebase. It is a collection of skills, subagent definitions, memory-bank templates, and task artifact conventions that help Codex turn an idea into a planned task, execute it with specialized agents, validate the result, and audit the work before final approval.
 
-The flow is built around four stages:
+## What Is This Project?
 
-1. Capture and refine project knowledge into steerings.
-2. Create a durable `.plans/PLAN_*.md` planning artifact.
-3. Split an approved plan into ACT task artifacts.
-4. Execute those subtasks through worker agents, then validate and audit the result.
+The scaffold organizes agentic work into a repeatable pipeline:
 
-The main execution skill is `$act`. The planning pipeline is `$plan` followed by `$split-to-tasks`.
+1. Capture project knowledge and conventions in `.memory-bank/`.
+2. Shape an idea into a durable `.plans/PLAN_*.md` planning artifact.
+3. Compile the approved plan into ACT-ready `.tasks/{TASK-ID}/` artifacts.
+4. Execute subtasks with worker agents.
+5. Validate, review, audit, and create fix subtasks when needed.
+6. Present a final approval summary, then optionally prepare release activities.
 
-## Main Parts
+The main pipeline is:
 
-### Skills
+```text
+$onboard
+$steering-specs-generator
+$interview-me / $idea-refine
+$plan
+$split-to-tasks
+$act
+optional post-ACT skills
+```
 
-- `.agents/skills/act/`
-  Runs a prepared task from `.tasks/{TASK-ID}/` through execution, validation, audit, and approval.
+## Core Concepts
 
-- `.agents/skills/plan/`
-  Creates or updates `.plans/PLAN_{id-or-feature-name}.md` as the source-of-truth planning artifact. It can lazily consult technical module skills, but it does not create ACT subtasks.
+| Concept | Definition |
+| --- | --- |
+| Skill | A reusable workflow instruction set in `.agents/skills/*/SKILL.md`. Skills can be invoked directly, or loaded lazily by another skill when their trigger applies. |
+| Agent | A specialized runtime subagent configured in `.codex/agents/*.toml`. ACT uses agents for implementation, validation, review, and final audit. |
+| Steering | Durable project convention stored in `.memory-bank/steerings/`. Workers read these before implementing or testing. |
+| Plan | A source-of-truth planning artifact at `.plans/PLAN_*.md`. `$split-to-tasks` requires `READY_FOR_SPLIT: yes`. |
+| Task | An ACT execution folder at `.tasks/{TASK-ID}/` containing `plan.md`, `subtasks/index.md`, and `stt-*.md` files. |
+| Subtask | A focused unit of work assigned to exactly one Phase 2 worker agent and scheduled with `seq=N`. |
+| Review report | A Phase 3 artifact written under `.tasks/{TASK-ID}/reviews/`. |
+| Audit report | The final Phase 3 decision artifact written under `.tasks/{TASK-ID}/audits/`. |
 
-- `.agents/skills/split-to-tasks/`
-  Converts a ready `.plans/PLAN_*.md` into ACT-ready `.tasks/{TASK-ID}/plan.md`, `subtasks/index.md`, and `stt-*.md` files.
+## Pipeline Overview
 
-- `.agents/skills/interview-me/`
-  Optional pre-plan skill for clarifying intent when the ask is underspecified.
+The scaffold has three main responsibilities:
 
-- `.agents/skills/idea-refine/`
-  Optional pre-plan skill for refining a vague idea into a concrete one-pager.
+- Planning: clarify intent, choose scope, capture constraints, and mark a plan ready only when it can be split without inventing requirements.
+- Execution: run the exact subtasks declared in `.tasks/{TASK-ID}/subtasks/index.md`, in numeric `seq` waves.
+- Verification: validate quality/build output, run specialized reviewers, aggregate findings in a final audit, and loop through fix subtasks until the task passes or needs human escalation.
 
-- `.agents/skills/api-and-interface-design/`
-  Lazy planning module for APIs, module boundaries, schemas, CLI contracts, integration contracts, and data/model contracts.
+ACT is deliberately an executor, not a planner. It does not reorder subtasks, invent missing work, or patch code directly from audit findings. Blocking findings become new fix subtasks, then the normal worker path runs again.
 
-- `.agents/skills/source-driven-development/`
-  Lazy planning/development module for framework, library, runtime, and platform decisions that need official documentation.
+## Skills By Phase
 
-- `.agents/skills/ci-cd-and-automation/`
-  Standalone skill and lazy planning module for CI, build automation, release gates, deployment automation, and command contracts.
+| Phase | Skill | File | Purpose |
+| --- | --- | --- | --- |
+| Setup and context | `$onboard` | [`.agents/skills/onboard/SKILL.md`](.agents/skills/onboard/SKILL.md) | Read repo context, recent state, memory-bank notes, and Serena memories. |
+| Setup and context | `$steering-specs-generator` | [`.agents/skills/steering-specs-generator/SKILL.md`](.agents/skills/steering-specs-generator/SKILL.md) | Extract tacit conventions into steering files and action items. |
+| Pre-plan clarification | `$interview-me` | [`.agents/skills/interview-me/SKILL.md`](.agents/skills/interview-me/SKILL.md) | Clarify objective, audience, success criteria, constraints, and non-goals. |
+| Pre-plan clarification | `$idea-refine` | [`.agents/skills/idea-refine/SKILL.md`](.agents/skills/idea-refine/SKILL.md) | Refine fuzzy ideas into assumptions, MVP scope, and not-doing decisions. |
+| Planning | `$plan` | [`.agents/skills/plan/SKILL.md`](.agents/skills/plan/SKILL.md) | Create or update `.plans/PLAN_*.md` as the source of truth. |
+| Lazy plan module | `$api-and-interface-design` | [`.agents/skills/api-and-interface-design/SKILL.md`](.agents/skills/api-and-interface-design/SKILL.md) | Guide APIs, schemas, CLI contracts, component props, and module boundaries. |
+| Lazy plan module | `$source-driven-development` | [`.agents/skills/source-driven-development/SKILL.md`](.agents/skills/source-driven-development/SKILL.md) | Ground version-sensitive framework or library decisions in official docs. |
+| Lazy plan module | `$ci-cd-and-automation` | [`.agents/skills/ci-cd-and-automation/SKILL.md`](.agents/skills/ci-cd-and-automation/SKILL.md) | Plan command contracts, quality gates, CI, build, and deployment automation. |
+| Lazy plan module | `$deprecation-and-migration` | [`.agents/skills/deprecation-and-migration/SKILL.md`](.agents/skills/deprecation-and-migration/SKILL.md) | Plan safe replacement, migration, removal, compatibility, and rollback. |
+| Lazy plan module | `$documentation-and-adrs` | [`.agents/skills/documentation-and-adrs/SKILL.md`](.agents/skills/documentation-and-adrs/SKILL.md) | Decide docs, ADRs, changelog, README, and memory-bank requirements. |
+| Task compilation | `$split-to-tasks` | [`.agents/skills/split-to-tasks/SKILL.md`](.agents/skills/split-to-tasks/SKILL.md) | Convert a ready plan into `.tasks/{TASK-ID}/` ACT artifacts. |
+| Execution | `$act` | [`.agents/skills/act/SKILL.md`](.agents/skills/act/SKILL.md) | Execute prepared subtasks, validate, review, audit, and manage fix loops. |
+| Optional post-ACT | `$code-review-and-quality` | [`.agents/skills/code-review-and-quality/SKILL.md`](.agents/skills/code-review-and-quality/SKILL.md) | Run an extra manual multi-axis review when desired. |
+| Optional post-ACT | `$security-and-hardening` | [`.agents/skills/security-and-hardening/SKILL.md`](.agents/skills/security-and-hardening/SKILL.md) | Run an extra manual security design or hardening pass. |
+| Optional post-ACT | `$shipping-and-launch` | [`.agents/skills/shipping-and-launch/SKILL.md`](.agents/skills/shipping-and-launch/SKILL.md) | Prepare release, rollout, monitoring, and rollback plans. |
 
-- `.agents/skills/deprecation-and-migration/`
-  Standalone skill and lazy planning module for replacing, removing, deprecating, migrating, or consolidating existing behavior.
+## Agents By ACT Phase
 
-- `.agents/skills/documentation-and-adrs/`
-  Standalone skill and lazy planning module for ADRs, docs, README, changelog, and memory-bank documentation requirements.
+| ACT phase | Agent | File | Purpose |
+| --- | --- | --- | --- |
+| Phase 2 worker | `code-implementer` | [`.codex/agents/code-implementer.toml`](.codex/agents/code-implementer.toml) | Implement normal feature, refactor, and fix subtasks. |
+| Phase 2 worker | `code-writer` | [`.codex/agents/code-writer.toml`](.codex/agents/code-writer.toml) | Handle narrow direct code-writing subtasks. |
+| Phase 2 worker | `docs-writer` | [`.codex/agents/docs-writer.toml`](.codex/agents/docs-writer.toml) | Create or update technical documentation artifacts. |
+| Phase 2 worker | `test-writer` | [`.codex/agents/test-writer.toml`](.codex/agents/test-writer.toml) | Write focused tests for assigned behavior. |
+| Phase 3 gate | `validator` | [`.codex/agents/validator.toml`](.codex/agents/validator.toml) | Run quality check and build commands from `project-commands.md`. |
+| Phase 3 gate | `code-reviewer` | [`.codex/agents/code-reviewer.toml`](.codex/agents/code-reviewer.toml) | Produce a read-only engineering review report. |
+| Phase 3 gate | `test-auditor` | [`.codex/agents/test-auditor.toml`](.codex/agents/test-auditor.toml) | Evaluate whether tests adequately cover the plan. |
+| Phase 3 gate | `security-auditor` | [`.codex/agents/security-auditor.toml`](.codex/agents/security-auditor.toml) | Conditionally audit security-sensitive changes. |
+| Phase 3 final gate | `auditor` | [`.codex/agents/auditor.toml`](.codex/agents/auditor.toml) | Aggregate validator and reviewer outputs into the authoritative audit decision. |
 
-- `.agents/skills/code-review-and-quality/`
-  Standalone manual code review skill. ACT automated review uses the `code-reviewer` agent.
+## How To Use The Pipeline
 
-- `.agents/skills/security-and-hardening/`
-  Standalone manual security guidance skill. ACT automated security review uses the `security-auditor` agent.
+### 1. Onboard to the repo
 
-- `.agents/skills/onboard/`
-  Helps an agent understand the project structure and current state before starting work.
+Use `$onboard` when starting in a repository, after context loss, or before significant work. It reads the memory bank, recent repo state, and Serena memories when available.
 
-- `.agents/skills/steering-specs-generator/`
-  Extracts tacit knowlege and conventions and turns them into steering files and action items.
+### 2. Define project conventions
 
-### Agents
+If `.memory-bank/steerings/` still contains templates or missing project rules, use `$steering-specs-generator`.
 
-Configured in `.codex/agents/`.
+At minimum, ACT workers expect:
 
-- `code-implementer`
-  Main implementation worker for feature/refactor/fix subtasks.
+```text
+.memory-bank/steerings/development-conventions.md
+.memory-bank/steerings/testing-conventions.md
+.memory-bank/steerings/project-commands.md
+```
 
-- `code-writer`
-  Narrow code-edit worker for direct code-writing subtasks.
+Before real ACT execution, replace template command placeholders in `project-commands.md` with concrete quality, build, and test commands.
 
-- `docs-writer`
-  Documentation worker.
+### 3. Clarify only when needed
 
-- `test-writer`
-  Testing worker that writes must-have tests for assigned subtasks.
+Use optional pre-plan skills when the request is not ready to plan:
 
-- `validator`
-  Runs quality checks and build.
+- `$interview-me` when intent, user, success criteria, constraints, or non-goals are unclear.
+- `$idea-refine` when the idea, direction, or MVP scope is still fuzzy.
 
-- `code-reviewer`
-  Phase 3 read-only reviewer that checks general engineering quality, correctness, maintainability, architecture fit, reliability, and regression risk.
+Skip both when the request is already concrete enough for `$plan`.
 
-- `test-auditor`
-  Phase 3 read-only reviewer that checks whether tests are meaningful, sufficient, and aligned with the plan.
+### 4. Create the plan
 
-- `security-auditor`
-  Conditional Phase 3 read-only reviewer that checks practical security risks when a task touches security-sensitive surfaces.
-
-- `auditor`
-  Thin final Phase 3 gate that aggregates validator context plus code-reviewer, test-auditor, and security-auditor reports into one authoritative audit decision.
-
-## Recommended End-to-End Flow
-
-### 1. Define project conventions
-
-If the project does not already have clear conventions, use `$steering-specs-generator`.
-
-Its goal is to produce steering files such as:
-
-- `.memory-bank/steerings/development-conventions.md`
-- `.memory-bank/steerings/testing-conventions.md`
-- `.memory-bank/steerings/project-commands.md`
-
-These are important because the worker agents depend on them.
-
-### 2. Create or update a plan
-
-Use optional pre-plan skills only when needed:
-
-- `$interview-me` if intent, user, success criteria, constraints, or non-goals are unclear.
-- `$idea-refine` if the idea or MVP scope is still fuzzy.
-
-Then use `$plan` to create or update:
+Use `$plan` to create or update:
 
 ```text
 .plans/PLAN_{id-or-feature-name}.md
 ```
 
-The plan is the exploratory source of truth. It should end with `READY_FOR_SPLIT: yes` only when decisions are stable enough for ACT decomposition.
+The plan may load lazy modules only when their trigger applies. Set:
 
-### 3. Split the plan into a task
+```text
+READY_FOR_SPLIT: yes
+```
 
-Once the plan is ready, use `$split-to-tasks` with the plan path and task ID:
+only when all blocking decisions are made.
+
+### 5. Split the plan into ACT artifacts
+
+Run `$split-to-tasks` only after the plan is ready:
 
 ```text
 $split-to-tasks .plans/PLAN_feature-name.md TASK-001
@@ -139,41 +149,27 @@ It creates:
     └── ...
 ```
 
-### 4. Ensure valid subtasks
+### 6. Execute with ACT
 
-Each subtask should be assigned to exactly one Phase 2 worker agent:
+Switch to a task-specific branch, then run:
 
-- `code-implementer`
-- `code-writer`
-- `docs-writer`
-- `test-writer`
+```text
+$act TASK-001
+```
 
-Do not place `validator`, `code-reviewer`, `test-auditor`, `security-auditor`, or `auditor` in `subtasks/index.md`.
+ACT will validate the task folder, execute subtask waves by `seq`, run validation and review gates, create fix subtasks for blocking findings, and stop for final user approval after all required gates pass.
 
-### 5. Execute the task with `$act`
+### 7. Use post-ACT skills manually
 
-`$act` is the orchestrator.
+After ACT passes, use these only when useful:
 
-It will:
+- `$code-review-and-quality` for an extra manual review.
+- `$security-and-hardening` for an extra security hardening pass.
+- `$shipping-and-launch` for release, rollout, monitoring, and rollback planning.
 
-1. Validate the task structure.
-2. Read `subtasks/index.md`.
-3. Group subtasks by `seq`.
-4. Run each `seq` wave in parallel.
-5. Wait for the whole wave to finish before starting the next one.
-6. Run `validator`.
-7. Run `code-reviewer` and `test-auditor`, plus `security-auditor` when the task touches security-sensitive surfaces.
-8. Run the final `auditor` to aggregate review reports into one audit decision.
-9. Create fix subtasks if validation, code review, test audit, security audit, or final audit fails.
-10. Repeat until the task passes or the flow must stop and escalate.
+## Required Files And Artifacts
 
-### 6. Review the final summary
-
-If validation and audit pass, the flow ends with a short approval summary for the user.
-
-## Required Files Before Running `$act`
-
-At minimum, make sure these exist:
+Before `$act`, the repo should contain:
 
 ```text
 .memory-bank/steerings/development-conventions.md
@@ -184,80 +180,126 @@ At minimum, make sure these exist:
 .tasks/{TASK-ID}/subtasks/index.md
 ```
 
-Also make sure you are on a task-specific git branch before execution.
-
-## How `subtasks/index.md` Works
-
-Each line should follow this shape:
+Each `subtasks/index.md` entry must use this shape:
 
 ```markdown
 - [ ] stt-001 | code-implementer | feature | seq=1 / Build feature shell
       Scaffold the core structure for the feature.
 ```
 
-Meaning:
-
-- `[ ]` = pending
-- `stt-001` = subtask file ID
-- `code-implementer` = exact runtime agent name
-- `feature` = category
-- `seq=1` = execution wave
-- `Build feature shell` = title
-
 Rules:
 
-- same `seq` means those subtasks may run in parallel
-- higher `seq` waits for lower `seq`
-- `seq` must be a positive integer
-- agent names must be exact
+- `seq=N` is the only scheduling mechanism.
+- Same `seq` means subtasks may run in parallel.
+- Higher `seq` waits for lower `seq`.
+- Agent names must be exact runtime IDs.
+- Phase 3 agents must never appear in `subtasks/index.md`.
 
-## What Each Worker Receives
+All Phase 2 workers receive the same contract:
 
-All Phase 2 workers use the same contract:
+```text
+task_id
+task_root
+plan_path
+subtask_path
+```
 
-- `task_id`
-- `task_root`
-- `plan_path`
-- `subtask_path`
+## Pipeline Diagram
 
-That means each worker reads:
+```mermaid
+flowchart TD
+  A["$onboard<br/>Understand repo, memory bank, agents, skills"] --> B["$steering-specs-generator<br/>Extract conventions into .memory-bank/steerings"]
 
-1. the task plan
-2. the specific subtask
-3. any references listed inside that subtask
+  B --> C{"Need clarification?"}
+  C -->|Intent unclear| D["$interview-me<br/>Clarify objective, user, success, constraints, non-goals"]
+  C -->|Idea/scope fuzzy| E["$idea-refine<br/>Refine idea, assumptions, MVP, not-doing list"]
+  C -->|Clear enough| PLAN
 
-## Example Usage Pattern
+  D --> PLAN
+  E --> PLAN
 
-For a normal piece of work:
+  subgraph PLAN["$plan<br/>Create/update .plans/PLAN_*.md<br/>Lazy plan modules loaded only when triggered"]
+    PLAN_CORE["Plan artifact<br/>READY_FOR_SPLIT: yes/no"]
 
-1. Create project steerings if needed.
-2. Optionally use `$interview-me` or `$idea-refine`.
-3. Use `$plan` to create or update `.plans/PLAN_*.md`.
-4. Review the plan and set `READY_FOR_SPLIT: yes`.
-5. Use `$split-to-tasks` to create `.tasks/{TASK-ID}/`.
-6. Switch to the task branch.
-7. Run `$act`.
-8. Wait for validation and audit.
-9. Review the final summary and approve.
+    M1["$api-and-interface-design"]
+    M2["$source-driven-development"]
+    M3["$ci-cd-and-automation"]
+    M4["$deprecation-and-migration"]
+    M5["$documentation-and-adrs"]
+
+    PLAN_CORE -. optional .-> M1
+    PLAN_CORE -. optional .-> M2
+    PLAN_CORE -. optional .-> M3
+    PLAN_CORE -. optional .-> M4
+    PLAN_CORE -. optional .-> M5
+  end
+
+  PLAN --> SPLIT["$split-to-tasks<br/>Compile plan into .tasks/TASK-ID"]
+
+  SPLIT --> ACT
+
+  subgraph ACT["$act<br/>Execute prepared .tasks/TASK-ID workflow"]
+    P1["Phase 1: Initialization<br/>Validate branch, plan.md, subtasks/index.md, seq waves"]
+
+    subgraph P2["Phase 2: Subtask execution<br/>Run worker waves by seq"]
+      W1["code-implementer"]
+      W2["code-writer"]
+      W3["docs-writer"]
+      W4["test-writer"]
+    end
+
+    subgraph P3["Phase 3: Verification and audit loop"]
+      V["validator<br/>quality check + build"]
+
+      subgraph RW["Parallel review wave"]
+        CR["code-reviewer"]
+        TA["test-auditor"]
+        SA["security-auditor<br/>conditional"]
+      end
+
+      FA["auditor<br/>final aggregate decision"]
+      PASS{"Audit passed?"}
+      FIX["Create fix subtasks<br/>execute fixes<br/>repeat Phase 3"]
+    end
+
+    P4["Phase 4: Final approval<br/>Concise user summary"]
+
+    P1 --> P2
+    P2 --> V
+    V --> RW
+    RW --> FA
+    FA --> PASS
+    PASS -->|No| FIX
+    FIX --> P2
+    PASS -->|Yes| P4
+  end
+
+  ACT --> POST["Manual post-ACT skills"]
+
+  POST --> R1["$code-review-and-quality<br/>manual extra review"]
+  POST --> R2["$security-and-hardening<br/>manual hardening pass"]
+  POST --> R3["$shipping-and-launch<br/>release, rollout, rollback plan"]
+```
 
 ## Common Mistakes
 
-- Missing steering files in `.memory-bank/steerings/`
-- Using display names instead of exact agent IDs
-- Forgetting `seq={N}` in `subtasks/index.md`
-- Putting `validator`, `code-reviewer`, `test-auditor`, `security-auditor`, or `auditor` into Phase 2 subtasks
-- Running `$split-to-tasks` before `.plans/PLAN_*.md` has `READY_FOR_SPLIT: yes`
-- Running execution without a proper task folder
+- Running `$act` while steering files are still generic templates.
+- Leaving concrete quality, build, or test commands undefined in `project-commands.md`.
+- Running `$split-to-tasks` before the plan says `READY_FOR_SPLIT: yes`.
+- Using display names instead of exact skill or agent IDs.
+- Forgetting `seq=N` in `subtasks/index.md`.
+- Placing `validator`, `code-reviewer`, `test-auditor`, `security-auditor`, or `auditor` in Phase 2 subtasks.
+- Treating `$act` as a planner instead of an executor.
+- Editing task order in prose instead of encoding it with `seq`.
 
-## If You Want to Dive Deeper
+## Dive Deeper
 
-Start in this order:
+Read these files in order:
 
-1. Read `.agents/skills/act/SKILL.md`
-2. Read `.agents/skills/plan/SKILL.md`
-3. Read `.agents/skills/split-to-tasks/SKILL.md`
-4. Read `.agents/skills/steering-specs-generator/SKILL.md`
-5. Read `.codex/agents/*.toml`
-6. Create one small test task and run the flow on it
+1. [`.agents/skills/act/SKILL.md`](.agents/skills/act/SKILL.md)
+2. [`.agents/skills/plan/SKILL.md`](.agents/skills/plan/SKILL.md)
+3. [`.agents/skills/split-to-tasks/SKILL.md`](.agents/skills/split-to-tasks/SKILL.md)
+4. [`.agents/skills/steering-specs-generator/SKILL.md`](.agents/skills/steering-specs-generator/SKILL.md)
+5. [`.codex/agents/`](.codex/agents/)
 
-That is the fastest way to understand how the pieces fit together.
+For a real downstream project, the fastest way to validate the scaffold is to customize the steerings, create one small plan, split it into a task, and run `$act` on a task-specific branch.

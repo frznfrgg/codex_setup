@@ -1,6 +1,6 @@
 name = "validator"
 description = "Runs a suite of quality checks (linting, type-checking, build) to validate task completion."
-model = "gpt-5.3-codex"
+model = "gpt-5.5"
 model_reasoning_effort = "low"
 sandbox_mode = "workspace-write"
 developer_instructions = """

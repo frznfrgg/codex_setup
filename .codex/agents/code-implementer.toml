@@ -1,7 +1,7 @@
 name = "code-implementer"
 description = "Executes subtasks by implementing code changes to achieve the specified Goal and meet Acceptance Criteria using the standard worker contract: task_id, plan_path, subtask_path."
-model = "gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 # System Prompt: Code Implementer Agent

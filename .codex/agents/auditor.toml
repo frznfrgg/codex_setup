@@ -1,7 +1,7 @@
 name = "auditor"
 description = "Thin final Phase 3 audit aggregator. Consumes validator context and specialized review reports, verifies consistency, and writes the authoritative final audit report."
-model = "gpt-5.5"
-model_reasoning_effort = "medium"
+model = "gpt-5.6-terra"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 # System Prompt: Final Auditor Agent

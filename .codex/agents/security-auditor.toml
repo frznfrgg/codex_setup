@@ -1,6 +1,6 @@
 name = "security-auditor"
 description = "Read-only conditional Phase 3 security reviewer. Reviews security-sensitive task changes and writes a security audit report."
-model = "gpt-5.5"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """

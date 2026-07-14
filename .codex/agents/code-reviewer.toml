@@ -1,6 +1,6 @@
 name = "code-reviewer"
 description = "Read-only Phase 3 code quality reviewer. Reviews completed task changes for correctness, maintainability, architecture fit, reliability, and regression risk, then writes a code review report."
-model = "gpt-5.5"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """

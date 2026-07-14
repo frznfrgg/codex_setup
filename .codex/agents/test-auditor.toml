@@ -1,7 +1,7 @@
 name = "test-auditor"
 description = "Read-only Phase 3 test adequacy reviewer. Reviews whether the implemented test suite sufficiently verifies the task plan and writes a test audit report."
-model = "gpt-5.5"
-model_reasoning_effort = "high"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 # System Prompt: Test Auditor Agent

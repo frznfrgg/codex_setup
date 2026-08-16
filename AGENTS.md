@@ -4,6 +4,12 @@
 
 [Describe what this repository is for, who or what it serves, and its primary responsibilities.]
 
+# Hard Constraints
+
+<!-- Replace this placeholder with the repository's non-negotiable constraints. -->
+
+[Describe rules that agents must never violate, or write "None" if no additional hard constraints apply.]
+
 # Context Map
 
 - `.memory-bank/` contains durable project knowledge.

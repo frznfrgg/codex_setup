@@ -10,11 +10,13 @@
 
 [Describe rules that agents must never violate, or write "None" if no additional hard constraints apply.]
 
+- Use Conventional Commits: task commits follow `<type>(TASK-ID): <description>`; non-task commits follow `<type>(scope): <description>`. Before committing, read only the detailed rules at [`.memory-bank/steerings/development-conventions.md` lines 61-76](.memory-bank/steerings/development-conventions.md#L61-L76).
+
 # Context Map
 
 - `.memory-bank/` contains durable project knowledge.
   - `index.md` is the entry point and directory of available project context.
-  - `steerings/development-conventions.md` defines implementation rules and coding conventions.
+  - `steerings/development-conventions.md` defines implementation, coding, and commit conventions.
   - `steerings/testing-conventions.md` defines testing rules and expectations.
   - `steerings/project-commands.md` defines the authoritative quality, build, test, and release commands.
   - `steerings/index.md` lists additional project-specific steering documents.

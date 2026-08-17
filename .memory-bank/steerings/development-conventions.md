@@ -1,12 +1,12 @@
 ---
 description: Template implementation conventions consumed by ACT code workers.
 status: template
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Development Conventions
 
-Implementation conventions consumed by ACT worker agents.
+Implementation and version-control conventions consumed by project agents.
 
 ## Intent (Why)
 
@@ -58,9 +58,21 @@ When a decision needs durable context, record it in `.memory-bank/architecture/`
 Treat commits as reviewable save points.
 
 ```text
-Good: task(TASK-001): complete stt-002
+Format: <type>(<scope>): <description>
+
+Task work: feat(TASK-001): add session renewal for stt-002
+Non-task work: feat(hooks): add lifecycle runtime context
+Avoid: task(TASK-001): complete stt-002
 Avoid: misc updates
 ```
+
+Use Conventional Commits for every commit:
+
+- Choose a lowercase type that matches the change: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, or `chore`.
+- For ACT work, use the exact `TASK-ID` as the scope, describe the delivered change, and include the completed `stt-xxxx` identifier in the description.
+- For work outside an ACT task, use the affected feature, component, or subsystem as the scope.
+- Write a concise imperative description without a trailing period.
+- Mark breaking changes with `!` before the colon and explain them in a `BREAKING CHANGE:` footer.
 
 Before committing, inspect the diff and ensure the commit contains only files required by the current task or subtask. If unrelated modified files exist, leave them alone.
 

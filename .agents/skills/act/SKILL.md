@@ -147,9 +147,9 @@ This critical quality assurance phase begins **only after all** pre-defined subt
   - [ ] Run `security-auditor` in the same review wave only if security audit is required. Provide it with: the implementation plan path (`plan.md`), path to `subtasks/index.md`, current task id, latest test audit report path if available from a prior iteration, and validator output/context if present.
   - [ ] Await every applicable specialized reviewer and receive report file paths.
 - [ ] Stage and commit specialized review reports:
-  - [ ] Code review report: `git add .tasks/{TASK-ID}/reviews/code-review-{timestamp}.md && git commit -m "task(TASK-ID): add code-review-{timestamp} report"`
-  - [ ] Test audit report: `git add .tasks/{TASK-ID}/reviews/test-audit-{timestamp}.md && git commit -m "task(TASK-ID): add test-audit-{timestamp} report"`
-  - [ ] Security audit report, when required: `git add .tasks/{TASK-ID}/reviews/security-audit-{timestamp}.md && git commit -m "task(TASK-ID): add security-audit-{timestamp} report"`
+  - [ ] Code review report: `git add .tasks/{TASK-ID}/reviews/code-review-{timestamp}.md && git commit -m "docs(TASK-ID): add code-review-{timestamp} report"`
+  - [ ] Test audit report: `git add .tasks/{TASK-ID}/reviews/test-audit-{timestamp}.md && git commit -m "docs(TASK-ID): add test-audit-{timestamp} report"`
+  - [ ] Security audit report, when required: `git add .tasks/{TASK-ID}/reviews/security-audit-{timestamp}.md && git commit -m "docs(TASK-ID): add security-audit-{timestamp} report"`
 - [ ] Read specialized review reports and collect:
   - [ ] latest code review report path and `CODE_REVIEW_STATUS`
   - [ ] latest test audit report path and `TEST_AUDIT_STATUS`
@@ -157,7 +157,7 @@ This critical quality assurance phase begins **only after all** pre-defined subt
   - [ ] Do not create fix subtasks directly from specialized review failures; pass all reports and statuses to the final auditor.
 - [ ] Invoke the final `Auditor` and provide it with: the implementation plan path (`plan.md`), path to `subtasks/index.md`, current task id, validator output/context if present, latest code review report path, latest test audit report path, and latest security audit report path or security audit skip rationale.
 - [ ] Await agent completion and receive audit report file path.
-- [ ] Stage and commit audit report: `git add .tasks/{TASK-ID}/audits/audit-{timestamp}.md && git commit -m "task(TASK-ID): add audit-{timestamp} report"`
+- [ ] Stage and commit audit report: `git add .tasks/{TASK-ID}/audits/audit-{timestamp}.md && git commit -m "docs(TASK-ID): add audit-{timestamp} report"`
 - [ ] Read the audit and parse audit findings: `AUDIT_STATUS`, `CODE_REVIEW_STATUS`, `TEST_STATUS`, and `SECURITY_STATUS` indicators, plus detailed issue analysis.
 - [ ] **If Audit Errors (AUDIT_STATUS: ERROR, CODE_REVIEW_STATUS: ERROR, TEST_STATUS: ERROR, or SECURITY_STATUS: ERROR):**
   - [ ] Stop and escalate to the user with the audit report path and the blocking reason.
@@ -198,7 +198,7 @@ When validation or audit fails, the orchestrator must create fix tasks with mini
 - Default rule: fix subtasks use the next execution wave, `seq={max existing seq + 1}`.
 
 **Git Commit**
-- Stage and commit fix subtask files and updated index: `git add .tasks/{TASK-ID}/subtasks/stt-{TASK-ID}-fixes-{NN}.md .tasks/{TASK-ID}/subtasks/index.md && git commit -m "task(TASK-ID): add fix subtasks from audit-{timestamp}"`
+- Stage and commit fix subtask files and updated index: `git add .tasks/{TASK-ID}/subtasks/stt-{TASK-ID}-fixes-{NN}.md .tasks/{TASK-ID}/subtasks/index.md && git commit -m "docs(TASK-ID): add fix subtasks from audit-{timestamp}"`
 
 **Execution**
 - Invoke the appropriate agent(s) with the fix subtasks files and audit context for these subtasks.
@@ -323,5 +323,6 @@ All Phase 2 worker agents (`code-implementer`, `code-writer`, `docs-writer`, `te
 - **Executor, Not Planner:** This workflow's sole purpose is to execute a pre-existing plan. It does not create, decompose, or re-order tasks.
 - **Respect Execution Order:** Follow numeric `seq` wave ordering from `subtasks/index.md`. All subtasks in the same `seq` may run in parallel; no higher `seq` may start before all lower `seq` work completes.
 - **Audit is the Ultimate Quality Gate:** The Phase 3 validation, code review, test audit, conditional security audit, and final audit steps are non-negotiable gates. No work is presented to the user until all required gates pass.
+- **Conventional Commits:** Use `<type>(TASK-ID): <description>` for task commits. Select the type that matches the change; use a functional scope instead of `TASK-ID` for commits outside an ACT task.
 - **Stage New Artifacts Explicitly:** When committing newly created files, stage them with `git add`; do not rely on `git commit -am`.
 - **Concise User Communication:** All user-facing reports, especially the final approval summary, must be brief and scannable.

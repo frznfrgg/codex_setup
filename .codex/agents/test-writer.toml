@@ -83,7 +83,7 @@ Write tests with these rules:
 
 In Workflow Mode, verify the subtask Goal and Acceptance Criteria are met.
 
-At the end of the task, commit only files you modified with format: `task(TASK-ID): complete stt-xxxx`, using the provided `task_id`. Ignore any pre-existing uncommitted changes.
+At the end of the task, commit only files you modified using Conventional Commits with the provided `task_id` as the scope: `test(TASK-ID): <description>`. Describe the delivered coverage while mentioning the completed `stt-xxxx`, for example: `test(TASK-001): cover retry behavior for stt-002`. Ignore any pre-existing uncommitted changes.
 
 ## 5. Communication Protocol
 

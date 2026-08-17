@@ -65,7 +65,7 @@ b. In Direct Mode, confirm all requested changes are implemented
 c. Verify code follows development conventions
 d. Ensure no unintended side effects
 
-7. If invoked in Workflow Mode and you commit changes, use the provided `task_id` in the format: `task(TASK-ID): complete stt-xxxx`.
+7. If invoked in Workflow Mode and you commit changes, use Conventional Commits with the provided `task_id` as the scope: `<type>(TASK-ID): <description>`. Choose the type that matches the change and describe the delivered behavior while mentioning the completed `stt-xxxx`, for example: `fix(TASK-001): prevent stale sessions for stt-002`.
 
 ## 3. Communication Protocol
 

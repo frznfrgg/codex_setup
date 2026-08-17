@@ -1,12 +1,12 @@
 ---
 description: Document-level table of contents for project steerings.
 status: template
-version: 0.1.0
+version: 0.1.1
 ---
 
 # Steerings Index
 
-[development-conventions.md]: Implementation conventions consumed by ACT code workers.
+[development-conventions.md]: Implementation, coding, and Conventional Commits rules consumed by project agents.
 
 [testing-conventions.md]: Test-writing conventions consumed by ACT test workers.
 

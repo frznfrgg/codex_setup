@@ -1,5 +1,30 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/bash-guard/src/bash_guard.bin\"",
+            "timeout": 3,
+            "statusMessage": "Loading runtime context"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/bash-guard/src/bash_guard.bin\"",
+            "timeout": 3,
+            "statusMessage": "Loading subagent context"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "^Bash$",
@@ -21,6 +46,30 @@
             "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/bash-guard/src/bash_guard.bin\"",
             "timeout": 3,
             "statusMessage": "Checking risk approval"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/bash-guard/src/bash_guard.bin\"",
+            "timeout": 3,
+            "statusMessage": "Handling subagent stop"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/bash-guard/src/bash_guard.bin\"",
+            "timeout": 3,
+            "statusMessage": "Handling turn stop"
           }
         ]
       }

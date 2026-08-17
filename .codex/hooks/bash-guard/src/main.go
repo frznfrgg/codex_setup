@@ -25,7 +25,12 @@ type HookInput struct {
 	TurnID         string    `json:"turn_id"`
 	Cwd            string    `json:"cwd"`
 	PermissionMode string    `json:"permission_mode"`
+	Model          string    `json:"model"`
 	Prompt         string    `json:"prompt"`
+	Source         string    `json:"source"`
+	AgentID        string    `json:"agent_id"`
+	AgentType      string    `json:"agent_type"`
+	StopHookActive bool      `json:"stop_hook_active"`
 }
 
 type ToolInput struct {
@@ -76,6 +81,8 @@ func main() {
 	}
 
 	switch in.HookEventName {
+	case "SessionStart", "SubagentStart", "SubagentStop", "Stop":
+		emit(*buildLifecycleOutput(in))
 	case "UserPromptSubmit":
 		handleUserPromptSubmit(in)
 	case "PreToolUse", "":
@@ -86,6 +93,54 @@ func main() {
 		}
 		return
 	}
+}
+
+// buildLifecycleOutput adds compact, programmatic runtime context only where
+// Codex supports model-visible additionalContext. Stop events deliberately
+// return an empty JSON object; injecting a block decision would create a
+// continuation prompt (and risks a stop-hook loop).
+func buildLifecycleOutput(in HookInput) *CodexOutput {
+	switch in.HookEventName {
+	case "SessionStart", "SubagentStart":
+		return &CodexOutput{
+			HookSpecificOutput: &HookSpecific{
+				HookEventName:     in.HookEventName,
+				AdditionalContext: lifecycleContext(in),
+			},
+		}
+	case "SubagentStop", "Stop":
+		return &CodexOutput{}
+	default:
+		return &CodexOutput{}
+	}
+}
+
+func lifecycleContext(in HookInput) string {
+	fields := []string{"event=" + quoteContextValue(in.HookEventName)}
+	appendField := func(name, value string) {
+		if value != "" {
+			fields = append(fields, name+"="+quoteContextValue(value))
+		}
+	}
+
+	appendField("source", in.Source)
+	appendField("agent_type", in.AgentType)
+	appendField("agent_id", in.AgentID)
+	appendField("cwd", in.Cwd)
+	appendField("permission_mode", in.PermissionMode)
+	appendField("model", in.Model)
+	return "Codex runtime context: " + strings.Join(fields, " ")
+}
+
+func quoteContextValue(value string) string {
+	// Keep hook-provided metadata on one short line. In particular, never pass
+	// transcript or assistant-message contents through lifecycle context.
+	value = strings.Join(strings.Fields(value), " ")
+	runes := []rune(value)
+	if len(runes) > 240 {
+		value = string(runes[:237]) + "..."
+	}
+	return fmt.Sprintf("%q", value)
 }
 
 func handlePreToolUse(in HookInput, start time.Time) {

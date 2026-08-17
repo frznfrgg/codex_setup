@@ -7,7 +7,7 @@ This is the Go-only Codex Bash safety hook. It keeps an internal `allow|ask` rul
 - **Source** (this dir): `<repo>/.codex/hooks/bash-guard/src/`
 - **Binary**: `<repo>/.codex/hooks/bash-guard/src/bash_guard.bin`
 - **Audit log**: `~/.codex/logs/bash-guard.jsonl`
-- **Hook config**: `<repo>/.codex/hooks.json` → `hooks.PreToolUse[matcher=Bash]`
+- **Hook config**: `<repo>/.codex/hooks.json` → lifecycle, Bash safety, and approval events
 
 ## Hard rules (do NOT relax)
 
@@ -24,7 +24,7 @@ make build     # ~50 ms warm; produces bash_guard.bin
 make test      # full suite, ~700 ms
 ```
 
-Codex loads `bash_guard.bin` directly for both `PreToolUse` and `UserPromptSubmit`. The next Bash hook invocation picks up the rebuilt binary automatically.
+Codex loads `bash_guard.bin` directly for `SessionStart`, `SubagentStart`, `PreToolUse`, `UserPromptSubmit`, `SubagentStop`, and `Stop`. The next hook invocation picks up the rebuilt binary automatically.
 
 For tight iteration use `make watch` (requires `entr`; `brew install entr`).
 

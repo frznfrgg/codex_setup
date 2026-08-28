@@ -70,6 +70,13 @@ ACT is deliberately an executor, not a planner. It does not reorder subtasks, in
 | Optional post-ACT | `$code-review-and-quality` | [`.agents/skills/code-review-and-quality/SKILL.md`](.agents/skills/code-review-and-quality/SKILL.md) | Run an extra manual multi-axis review when desired. |
 | Optional post-ACT | `$security-and-hardening` | [`.agents/skills/security-and-hardening/SKILL.md`](.agents/skills/security-and-hardening/SKILL.md) | Run an extra manual security design or hardening pass. |
 | Optional post-ACT | `$shipping-and-launch` | [`.agents/skills/shipping-and-launch/SKILL.md`](.agents/skills/shipping-and-launch/SKILL.md) | Prepare release, rollout, monitoring, and rollback plans. |
+| Prompt work | `$prompt-engineering` | [`.agents/skills/prompt-engineering/SKILL.md`](.agents/skills/prompt-engineering/SKILL.md) | Guide and route prompt writing, improvement, debugging, and optimization. |
+| Prompt work | `$prompt-clarity-and-structure` | [`.agents/skills/prompt-clarity-and-structure/SKILL.md`](.agents/skills/prompt-clarity-and-structure/SKILL.md) | Improve prompt clarity, structure, examples, delimiters, and output consistency. |
+| Prompt work | `$prompt-reasoning-and-chaining` | [`.agents/skills/prompt-reasoning-and-chaining/SKILL.md`](.agents/skills/prompt-reasoning-and-chaining/SKILL.md) | Design multi-step reasoning and chained LLM workflows with validation. |
+| Prompt work | `$prompt-grounding-and-rag` | [`.agents/skills/prompt-grounding-and-rag/SKILL.md`](.agents/skills/prompt-grounding-and-rag/SKILL.md) | Reduce hallucinations and improve grounding, long-context handling, chunking, and reranking. |
+| Prompt work | `$prompt-agents-and-tools` | [`.agents/skills/prompt-agents-and-tools/SKILL.md`](.agents/skills/prompt-agents-and-tools/SKILL.md) | Design tool schemas, agent loops, state, termination, error handling, and handoffs. |
+| Prompt work | `$prompt-security-and-production` | [`.agents/skills/prompt-security-and-production/SKILL.md`](.agents/skills/prompt-security-and-production/SKILL.md) | Harden prompts against injection and improve portability, caching, and multimodal behavior. |
+| Prompt work | `$prompt-evaluation` | [`.agents/skills/prompt-evaluation/SKILL.md`](.agents/skills/prompt-evaluation/SKILL.md) | Build eval sets, metrics, comparisons, regression tests, and production monitoring. |
 
 ## Agents By ACT Phase
 
